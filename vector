@@ -1,0 +1,33 @@
+class Vectorclock:
+    def __init__(self,process_id,num_process):
+        self.process_id=process_id
+        self.num_process=num_process
+        self.vector=[0]*self.num_process
+
+
+    def event(self):
+        self.vector[self.process_id]+=1
+        print(f"{self.process_id+1} internal event with {self.vector}")
+
+
+    def send(self,receiver):
+        self.vector[self.process_id]+=1
+        print(f"{self.process_id+1} send message to {receiver.process_id+1} with {self.vector}")
+        receiver.receive(self.process_id,self.vector)
+
+    def receive(self,senderid,sendervector):
+        for i in range(self.num_process):
+            self.vector[i]=max(self.vector[i],sendervector[i])
+        self.vector[self.process_id]+=1
+        print(f"{self.process_id+1} recieved message from process {senderid+1} with  {self.vector}")
+
+process1=Vectorclock(0,3)
+process2=Vectorclock(1,3)
+process3=Vectorclock(2,3)
+
+process1.event()
+process1.send(process2)
+process2.event()
+process2.send(process3)
+process3.event()
+process3.send(process1)
