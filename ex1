@@ -1,0 +1,144 @@
+import socket
+
+HOST = "127.0.0.1"
+PORT = 5000
+
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+server_socket.bind((HOST, PORT))
+server_socket.listen(1)
+
+print("Server is waiting for connection...")
+
+conn, address = server_socket.accept()
+
+print("Connected by:", address)
+
+while True:
+    data = conn.recv(1024).decode()
+
+    if not data:
+        break
+
+    print("Received from client:", data)
+    numbers = list(map(int, data.split()))
+    total = sum(numbers)
+    response = f"Sum = {total}"
+    conn.send(response.encode())
+
+conn.close()
+server_socket.close()
+
+
+
+
+import socket
+
+HOST = "127.0.0.1"
+PORT = 5000
+
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+client_socket.connect((HOST, PORT))
+
+print("Connected to server.")
+
+numbers = input("Enter numbers separated by spaces: ")
+
+client_socket.send(numbers.encode())
+
+response = client_socket.recv(1024).decode()
+
+print("Server response:", response)
+
+client_socket.close()
+
+
+
+
+class DataObject:
+
+    def __init__(self, name, values):
+        self.name = name
+        self.values = values
+
+    def __str__(self):
+        return f"Name: {self.name}, Values: {self.values}"
+
+import socket
+import pickle
+
+HOST = "127.0.0.1"
+PORT = 5001
+
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+server_socket.bind((HOST, PORT))
+server_socket.listen(1)
+
+print("Server is waiting for connection...")
+
+conn, address = server_socket.accept()
+
+print("Connected by:", address)
+
+# Receive serialized object
+data = conn.recv(4096)
+
+# Deserialize object
+obj = pickle.loads(data)
+
+print("Received object:")
+print("Name:", obj.name)
+print("Values:", obj.values)
+
+# Calculate sum
+total = sum(obj.values)
+
+print("Sum of values:", total)
+
+# Send response
+response = f"Sum of values = {total}"
+
+conn.send(response.encode())
+
+conn.close()
+server_socket.close()
+
+
+
+import socket
+import pickle
+
+from data_object import DataObject
+
+HOST = "127.0.0.1"
+PORT = 5001
+
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+client_socket.connect((HOST, PORT))
+
+print("Connected to server.")
+
+# Create DataObject
+obj = DataObject(
+    "Numbers",
+    [10, 20, 30, 40, 50]
+)
+
+print("Sending object:")
+print(obj)
+
+# Serialize object
+data = pickle.dumps(obj)
+
+# Send serialized object
+client_socket.send(data)
+
+# Receive response
+response = client_socket.recv(1024).decode()
+
+print("Server response:", response)
+
+client_socket.close()
