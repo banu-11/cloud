@@ -1,0 +1,32 @@
+import threading
+import time
+
+processes = ["P1", "P2", "P3"]
+
+replies = 0
+lock = threading.Lock()
+
+
+def request_cs(process):
+    global replies
+
+    print(process, "sending REQUEST to all processes")
+
+    replies = 0
+
+    for p in processes:
+        if p != process:
+            print(process, "received REPLY from", p)
+            replies += 1
+
+    # Enter CS after receiving all replies
+    if replies == len(processes) - 1:
+
+        print(process, "entered Critical Section")
+
+        time.sleep(2)
+
+        print(process, "exited Critical Section")
+
+
+request_cs("P1")
