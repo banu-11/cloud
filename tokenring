@@ -1,0 +1,22 @@
+import time
+
+processes = ["P1", "P2", "P3", "P4"]
+
+token = 0
+
+for i in range(8):
+
+    process = processes[token]
+
+    print("\nToken received by", process)
+
+    print(process, "entered Critical Section")
+
+    time.sleep(1)
+
+    print(process, "exited Critical Section")
+
+    # Pass token to next process
+    token = (token + 1) % len(processes)
+
+    print("Token passed to", processes[token])
