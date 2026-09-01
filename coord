@@ -1,0 +1,33 @@
+coordinator
+
+import threading
+import time
+
+lock = threading.Lock()
+
+
+def process(name):
+    print(name, "requesting access")
+
+    with lock:
+        print(name, "entered Critical Section")
+
+        time.sleep(2)
+
+        print(name, "exited Critical Section")
+
+
+threads = []
+
+for i in range(3):
+    t = threading.Thread(
+        target=process,
+        args=(f"Process-{i + 1}",)
+    )
+
+    threads.append(t)
+    t.start()
+
+
+for t in threads:
+    t.join()
