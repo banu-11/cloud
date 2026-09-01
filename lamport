@@ -1,0 +1,56 @@
+class LamportClock:
+
+    def __init__(self, process_name):
+        self.process_name = process_name
+        self.clock = 0
+
+    def event(self):
+        self.clock += 1
+        print(self.process_name, "Event -> Clock:", self.clock)
+
+    def send_message(self):
+        self.clock += 1
+
+        print(
+            self.process_name,
+            "Sending message -> Timestamp:",
+            self.clock
+        )
+
+        return self.clock
+
+    def receive_message(self, received_timestamp):
+        self.clock = max(
+            self.clock,
+            received_timestamp
+        ) + 1
+
+        print(
+            self.process_name,
+            "Received message -> Clock:",
+            self.clock
+        )
+
+
+# Create two processes
+p1 = LamportClock("P1")
+p2 = LamportClock("P2")
+
+
+# P1 performs an event
+p1.event()
+
+# P1 sends message to P2
+timestamp = p1.send_message()
+
+# P2 receives message
+p2.receive_message(timestamp)
+
+# P2 performs another event
+p2.event()
+
+# P2 sends message back to P1
+timestamp = p2.send_message()
+
+# P1 receives message
+p1.receive_message(timestamp)
